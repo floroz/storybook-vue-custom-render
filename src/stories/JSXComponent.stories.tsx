@@ -1,11 +1,11 @@
 import type { Meta, StoryObj, VueRenderer } from '@storybook/vue3';
 import type { ArgTypes, Args, DecoratorFunction } from "@storybook/types"
-import {  h } from "vue";
+import { h, ref } from "vue";
 
 import { JSXComponent } from './JSXComp';
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
-const decorators:DecoratorFunction<VueRenderer>[] =[]// [(storyFn)=> h('div',{style:{border:'2px solid red',padding:'20px'}} ,h(storyFn()) )]
+const decorators: DecoratorFunction<VueRenderer>[] = []// [(storyFn)=> h('div',{style:{border:'2px solid red',padding:'20px'}} ,h(storyFn()) )]
 const meta = {
   title: 'Example/JSX Component',
   component: JSXComponent,
@@ -26,50 +26,62 @@ export const JSXSyntax: Story = {
   args: {
     label: ' Label from Story Args passed to JSXComponent',
   },
-  render(args:Args) {
-
-    return <JSXComponent {...args} />;
-  }
+  render(args: Args) {
+    return {
+      name: JSXComponent.name,
+      setup() {
+        return () => <JSXComponent {...args} />
+      }
+    };
+  },
+  // render(args:Args) {
+  //   return <JSXComponent {...args} />
+  // },
 };
 
 export const HRenderFunction: Story = {
-  args:{
+  args: {
     label: ' Rendered Using h() function',
   },
-  render(args:Args) {
-    return h(JSXComponent, args);
-  },
+  render(args: Args) {
+    return {
+      setup() {
+        const counter = ref<number>(args.counter ?? 0);
+        return () => h(JSXComponent, { ...args, counter: counter.value, onIncrementCounter: c => counter.value = c })
+      }
+    }
+  }
 
 }
 
 export const CompositionApiComponent: Story = {
-  args:{
+  args: {
     label: ' Rendered using Composition Component ',
   },
-  render(args:Args) {
+  render(args: Args) {
     return ({
       components: { JSXComponent },
-      setup(props: any, { attrs }: any){
-        return { props , args , attrs}
-    }, 
+      setup(props: any, { attrs }: any) {
+        return { props, args, attrs }
+      },
       template: `<pre>{{ JSON.stringify(args)}}</pre> 
-                 <JSXComponent v-bind="args"  />` 
+                 <JSXComponent v-bind="args"  />`
     });
-  }  
+  }
 }
 
 
 export const OptionsApiComponent: Story = {
-  args:{
+  args: {
     label: ' Rendered usingComposition Component ',
   },
-  render(args: Args , { argTypes }: ArgTypes) {
+  render(args: Args, { argTypes }: ArgTypes) {
     return ({
       props: Object.keys(argTypes),
       data: () => ({ args }),
       components: { JSXComponent },
       template: `<pre>{{ JSON.stringify(args)}}</pre><JSXComponent v-bind="args" />`
     });
-  }  
+  }
 }
 

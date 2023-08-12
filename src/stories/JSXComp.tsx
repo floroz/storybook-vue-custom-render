@@ -18,7 +18,6 @@ export const JSXComponent = defineComponent({
   name: 'JSXComponent',
   emits: ['incrementCounter'],
   setup(props , { emit }) {
-    
     console.log('JSXComponent',props)
     const counter = ref(props.counter ?? 0 ); 
     const inc = () => {
